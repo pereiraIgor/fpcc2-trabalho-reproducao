@@ -1,0 +1,47 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{hyperref}
+\usepackage{url} % For breaking long URLs in footnotes
+
+\title{Projeto de Reprodução}
+\author{Igor de Sousa Pereira}
+\date{July 2024}
+
+\begin{document}
+
+\maketitle
+
+\section{Introdução}
+Para este projeto de reprodução, utilizamos o trabalho de Karapiperis intitulado \emph{A Suite of Efficient Randomized Algorithms for Streaming Record Linkage}, que apresenta uma técnica inovadora para lidar com dados provenientes de diferentes fontes no contexto de streaming. Essa técnica, denominada Resolução de Entidades, tem como objetivo unir duas fontes de dados e identificar pares de entidades iguais, permitindo assim obter insights valiosos, melhorar a qualidade dos \emph{datasets}, entre outros benefícios.
+
+A principal característica do método descrito neste trabalho é a transformação de valores de string em representações numéricas, chamadas de \emph{hash}. O conceito subjacente a essa abordagem é que, teoricamente, ao gerar valores de \emph{hash} para dois nomes de pessoas, como "Ygor" e "Igor", devido à sua grande similaridade semântica, os valores criados serão bastante parecidos (às vezes até iguais, dependendo do método utilizado para a criação dos \emph{hashes}). Dessa forma, esses algoritmos conseguem capturar a semelhança, facilitando a tarefa de Resolução de Entidades.
+
+Neste projeto, buscamos verificar a consistência dos resultados obtidos pelo autor, garantindo assim que seus resultados são confiáveis.
+
+\section{Metodologia}
+Utilizamos o código disponível no GitHub do autor\footnote{\url{https://github.com/dimkar121/Approximate-Blocking/tree/master}}. Os \emph{datasets} mencionados no artigo estão disponíveis em:
+\begin{itemize}
+    \item \url{https://www.ncsbe.gov/results-data/voter-registration-data}
+    \item \url{https://dblp.org/xml}
+    \item \url{https://dbs.uni-leipzig.de/research/projects/object_matching/benchmark_datasets_for_entity_resolution}
+\end{itemize}
+
+Devemos salientar que os dois primeiros \emph{datasets} são muito grandes em tamanho e em quantidade de informações (\emph{records}), sendo respectivamente 2 milhões e 16 milhões de \emph{records}. Tentativas de executar tais \emph{datasets} sofreram com \emph{overflow} de memória principal, não permitindo a execução do \emph{dataset}.
+
+O ambiente testado foi uma máquina física contendo 16 GB de RAM com frequência de 3000 MHz, processador Intel Core i5 10400 @ 2.90GHz × 12, SSD NVME de 1 TB de armazenamento, rodando o sistema Ubuntu 22.04.4 LTS 64 bits. O ambiente foi o Conda versão 23.11.0 e Python 3.11.5. As versões das bibliotecas são as mesmas descritas no repositório. Também testamos em um ambiente Google Compute Engine (Google Colab), com 12.7 GB de RAM e 107.7 GB de armazenamento, porém sem sucesso em ler tais \emph{datasets}.
+
+\section{Reprodução}
+A fim de reprodução, recuperamos o codigo e modificamos 4 parâmetros: L, L1, \emph{offsetA} e \emph{offsetB}. Os parâmetros L e L1 referem-se à quantidade de \emph{hashes} gerados para cada \emph{record} que o algoritmo lidará. Colocamos os novos valores de L e L1 para 80 e 35 (anteriormente atribuídos como 115 e 50, respectivamente), a fim de verificar como o código se comportaria tendo menos valores \emph{hashes} gerados para cada \emph{record}. Os valores de \emph{offsetA} e \emph{offsetB} foram ambos colocados para 50 (anteriormente atribuídos como 1) para forçar o código a lidar com mais valores de uma vez.
+
+O \emph{dataset} escolhido foi o SCD, que possui 66 mil \emph{records}, por conseguir rodar na máquina local. O experimento foi executado 10 vezes e obtida a média dos valores retornados, como \emph{recall} e \emph{precision}, tempo de bloqueio e \emph{matching} a fim de obter valores mais generalizáveis.
+
+A partir disso, ao executarmos o código, obtivemos como média:
+\begin{itemize}
+    \item \emph{Recall}: 0.9285019637179726
+    \item \emph{Precision}: 0.6739888737150423
+\end{itemize}
+
+\section{Conclusões}
+Comparando aos resultados do artigo, vimos que as métricas para esses 66 mil \emph{records} se comportam de maneira semelhante em relação ao \emph{recall}, também 0.92. Em relação à precisão, o valor que foi evidenciado foi aproximadamente 0.5, o que mostra uma grande melhora em nossa execução, comparada à do autor. Devemos levar em conta que o tamanho do \emph{offset} influenciou no processamento e, consequentemente, melhorou o resultado da precisão.
+
+\end{document}
